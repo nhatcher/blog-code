@@ -4,11 +4,64 @@ const importObject = {
         memory: memory,
     },
     math: {
-        sin: Math.sin,
-        cos: Math.cos
+        sin: (x) => Math.sin(x),
+        cos: (x) => Math.cos(x)
+    },
+    canvas: {
+        circle: (x, y, r) => {
+
+        },
+        line: (x0, y0, x1, y1) => {
+
+        }
+    },
+    debug: {
+        print: (pointer, len) => {
+            const result = new Uint8Array(memory.buffer, pointer, len);
+            const decoder = new TextDecoder();
+            const txt =  decoder.decode(result);
+            console.log(txt);
+        },
+        // double_to_string: (value, ppResult, pLen) => {
+        //     // convert value to utf-8 byte array
+        //     const txt = `${value}`;
+        //     const encoder = new TextEncoder();
+        //     const val_utf8 = encoder.encode(txt);
+        //     const len = val_utf8.length;
+            
+        //     // We allocate the string somewhere in memory
+        //     const pResult = malloc(len);
+        //     const result = new Uint8Array(memory.buffer, pResult, len);
+        //     result.set(val_utf8);
+
+        //     // ppResult points to a number that points to result
+        //     const c = new Uint8Array(memory.buffer, ppResult, 1);
+        //     c.set(pResult);
+
+        //     // pLen points to the length
+        //     const d = new Uint8Array(memory.buffer, pLen, 1);
+        //     d.set(len);
+        // }
+        double_to_string: (value, pLen) => {
+            // convert value to utf-8 byte array
+            const txt = `${value}\0`;
+            const encoder = new TextEncoder();
+            const val_utf8 = encoder.encode(txt);
+            const len = val_utf8.length;
+            
+            // We allocate the string somewhere in memory
+            const pResult = malloc(len);
+            const result = new Uint8Array(memory.buffer, pResult, len);
+            result.set(val_utf8);
+
+            // pLen points to the length
+            const d = new Uint8Array(memory.buffer, pLen, 1);
+            d.set(len);
+            return pResult;
+        }
     }
-  };
-// const env = { memory: memory, sqrt: (x) => Math.sqrt(x) };
+};
+
 const { instance } = await WebAssembly.instantiateStreaming(fetch("./main.wasm"), importObject);
 const {malloc, free, vector_norm} = instance.exports;
 
