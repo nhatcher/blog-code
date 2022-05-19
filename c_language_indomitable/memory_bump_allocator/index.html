@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+  <html lang="en" >
+  <head>
+    <meta charset="UTF-8">
+    <title>Wasm with a bump allocator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="module">
+        import {addVectors} from './main.js';
+        
+        function stringifyVector(v) {
+            return `[${v.map(s => s.toFixed(2)).join(', ')}]`;
+        }
+        
+        function generateRandomVector(n) {
+            const vector = new Float64Array(n);
+            for (let i=0; i<n; i++) {
+                vector[i] = 100*Math.random();
+            }
+            return vector;
+        }
+        
+        const vector1 = document.getElementById('vector-1');
+        const vector2 = document.getElementById('vector-2');
+        
+        const update = () => {
+            const n = Number(document.getElementById("dimension").value);
+            const v1 = generateRandomVector(n);
+            vector1.innerText = stringifyVector(v1);
+            const v2 = generateRandomVector(n);
+            vector2.innerText = stringifyVector(v2);
+            const v3 = addVectors(v1, v2, n);
+            document.getElementById('vector-result').innerText = stringifyVector(v3);
+        };
+
+        document.getElementById("generate").addEventListener('click', update);
+        document.getElementById("dimension").addEventListener('change', update);
+        update();
+    </script>
+  </head>
+  <body>
+  
+  <div class="title">A simple Wasm module with a bump allocator</div>
+  <div><span>Vector length:</span><input id="dimension" type="number" value="4"/></div>
+  <div><span>Input 1:</span><div class="vector" id="vector-1"></div>
+  <div><span>Input 2:</span><div class="vector" id="vector-2"></div>
+  <div><span>Result:</span><div class="vector" id="vector-result"></div></div>
+  <div><input type="button" id="generate" value="Generate"/></div>
+  </div>
+  
+  </body>
+  </html>

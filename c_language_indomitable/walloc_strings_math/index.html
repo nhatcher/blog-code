@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+  <html lang="en" >
+  <head>
+    <meta charset="UTF-8">
+    <title>Wasm with a bump allocator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="module">
+        import {stringLength, stringReverse, sayHello} from './main.js';
+        
+        const update = () => {
+            const inputString = document.getElementById("input-string").value;
+            const length = stringLength(inputString);
+            const reverse = stringReverse(inputString);
+            document.getElementById('input-string-length').innerText = length;
+            document.getElementById('input-string-reverse').innerText = reverse;
+        };
+        document.getElementById("input-string").addEventListener('change', update);
+        document.getElementById("my-name-is").addEventListener("change", () => {
+          const name = document.getElementById("my-name-is").value;
+          document.getElementById("say-hello").innerText = sayHello(name);
+        });
+        update();
+        const name = document.getElementById("my-name-is").value;
+        document.getElementById("say-hello").innerText = sayHello(name);
+    </script>
+  </head>
+  <body>
+  
+  <div class="title">A simple Wasm module with a bump allocator</div>
+  <div><span>Type a string:</span><input type="text" id="input-string" value="Love conquers all"/></div>
+  <div><span>The length is:</span><span id="input-string-length"></span></div>
+  <div><span>In reverse it reads:</span><span id="input-string-reverse"></span></div>
+  <div><input id="my-name-is" type="text" value="World!"></input><span id="say-hello"></span></div>
+  </div>
+  
+  </body>
+  </html>

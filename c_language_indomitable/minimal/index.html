@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Simplest wasm example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="module">
+    // Get the wasm and instantiate it.
+    const memory = new WebAssembly.Memory({ initial: 1 });
+    const env = { memory: memory };
+    const { instance } = await WebAssembly.instantiateStreaming(fetch("./main.wasm"), { env });
+    
+    // Setup the inputs and event listeners
+    const input1 = document.getElementById('input-1');
+    const input2 = document.getElementById('input-2');
+    const update = () => {
+        const value1 = Number(input1.value);
+        const value2 = Number(input2.value);
+        const result = instance.exports.multiply_add(value1, value2);
+        document.getElementById('result').innerText = `${result}`;
+    };
+    input1.addEventListener('change', update);
+    input2.addEventListener('change', update);
+
+    // first time load
+    update();
+  </script>
+</head>
+<body>
+<div class="title">A simple Wasm module!</div>
+<div><span>Input 1:</span><input id="input-1" type="number"/ value="5"></div>
+<div><span>Input 2:</span><input id="input-2" type="number"/ value="6"></div>
+<div><span>Result of multiply-add:</span><span id="result"></span></div>
+</div>
