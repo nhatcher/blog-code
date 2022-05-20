@@ -1,3 +1,6 @@
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
 const memory = new WebAssembly.Memory({ initial: 10 });
 const importObject = {
     env: {
@@ -9,41 +12,27 @@ const importObject = {
     },
     canvas: {
         circle: (x, y, r) => {
-
+            ctx.arc(x, y, r, 0, 2 * Math.PI);
         },
         line: (x0, y0, x1, y1) => {
-
-        }
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+        },
+        begin_draw: () => {
+            ctx.beginPath();
+        },
+        end_draw: () => {
+            ctx.stroke();
+        },
     },
     debug: {
         print: (pointer, len) => {
             const result = new Uint8Array(memory.buffer, pointer, len);
             const decoder = new TextDecoder();
-            const txt =  decoder.decode(result);
-            console.log(txt);
+            console.log(decoder.decode(result));
         },
-        // double_to_string: (value, ppResult, pLen) => {
-        //     // convert value to utf-8 byte array
-        //     const txt = `${value}`;
-        //     const encoder = new TextEncoder();
-        //     const val_utf8 = encoder.encode(txt);
-        //     const len = val_utf8.length;
-            
-        //     // We allocate the string somewhere in memory
-        //     const pResult = malloc(len);
-        //     const result = new Uint8Array(memory.buffer, pResult, len);
-        //     result.set(val_utf8);
-
-        //     // ppResult points to a number that points to result
-        //     const c = new Uint8Array(memory.buffer, ppResult, 1);
-        //     c.set(pResult);
-
-        //     // pLen points to the length
-        //     const d = new Uint8Array(memory.buffer, pLen, 1);
-        //     d.set(len);
-        // }
-        double_to_string: (value, pLen) => {
-            // convert value to utf-8 byte array
+        double_to_string: (value) => {
+            // Add the null C-string termination and convert value to utf-8 byte array
             const txt = `${value}\0`;
             const encoder = new TextEncoder();
             const val_utf8 = encoder.encode(txt);
@@ -54,37 +43,16 @@ const importObject = {
             const result = new Uint8Array(memory.buffer, pResult, len);
             result.set(val_utf8);
 
-            // pLen points to the length
-            const d = new Uint8Array(memory.buffer, pLen, 1);
-            d.set(len);
             return pResult;
         }
     }
 };
 
 const { instance } = await WebAssembly.instantiateStreaming(fetch("./main.wasm"), importObject);
-const {malloc, free, vector_norm} = instance.exports;
+const {malloc, set_seed, draw_crazy} = instance.exports;
 
-
-export function vectorNorm(v1, n) {
-    // allocate the memory
-    
-    // A C double is 64 bits or 8 bytes
-    const sizeOFDouble = 8;
-    // We need to allocate memory for `n` doubles by vector
-    const vectorSize = n * sizeOFDouble;
-
-    const pointer1 = malloc(vectorSize);
-
-    // Set the vectors in the memory
-    const c1 = new Float64Array(memory.buffer, pointer1, n);
-    c1.set(v1);
-
-    // do the wasm call
-    const result = vector_norm(pointer1, n);
-
-    free(vectorSize);
-
-    // and we are done
-    return result;
+export function drawCrazy(x, y, r, n, delta) {
+    set_seed( Math.floor(Math.random()* (2**32)));
+    ctx.clearRect(0, 0, 600, 480);
+    return draw_crazy(x, y, r, n, delta);
 }

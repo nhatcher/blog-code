@@ -5,42 +5,24 @@
     <title>External calls</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="module">
-        import {vectorNorm} from './main.js';
-        
-        function stringifyVector(v) {
-            return `[${v.map(s => s.toFixed(2)).join(', ')}]`;
-        }
-        
-        function generateRandomVector(n) {
-            const vector = new Float64Array(n);
-            for (let i=0; i<n; i++) {
-                vector[i] = 100*Math.random();
-            }
-            return vector;
-        }
-        
-        const vector1 = document.getElementById('vector-1');
-        
-        const update = () => {
-            const n = Number(document.getElementById("dimension").value);
-            const v1 = generateRandomVector(n);
-            vector1.innerText = stringifyVector(v1);
-            const norm = vectorNorm(v1, n);
-            document.getElementById('vector-result').innerText = norm;
+        import {drawCrazy} from './main.js';
+        const go_nuts = () => {
+            const n = Number(document.getElementById("lines_count").value);
+            const delta = Number(document.getElementById("delta_angle").value);
+            drawCrazy(640, 480, n, delta);
         };
 
-        document.getElementById("generate").addEventListener('click', update);
-        document.getElementById("dimension").addEventListener('change', update);
-        update();
+        document.getElementById("lines_count").addEventListener('input', go_nuts);
+        document.getElementById("delta_angle").addEventListener('input', go_nuts);
+        go_nuts();
     </script>
   </head>
   <body>
   
-  <div class="title">A simple Wasm module with a bump allocator</div>
-  <div><span>Vector length:</span><input id="dimension" type="number" value="4"/></div>
-  <div><span>Input 1:</span><div class="vector" id="vector-1"></div>
-  <div><span>Result:</span><div class="vector" id="vector-result"></div></div>
-  <div><input type="button" id="generate" value="Generate"/></div>
+  <div class="title">Drawing in canvas with wasm</div>
+  <div><span>Lines:</span><input id="lines_count" type="range" min="0" max="100" value="60"/></div>
+  <div><span>Angle</span><input id="delta_angle" type="range" value="90" min="0" max="360"/></div>
+  <div><canvas id="canvas" width="640" height="480"></canvas></div>
   </div>
   
   </body>
