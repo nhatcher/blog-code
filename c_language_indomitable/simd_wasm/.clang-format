@@ -1,0 +1,8 @@
+---
+Language:        Cpp
+BasedOnStyle:  Mozilla
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+BreakBeforeBraces: Attach
+...
+

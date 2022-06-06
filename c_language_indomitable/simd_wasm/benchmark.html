@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SIMD instructions</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="module">
+      import {
+        multiplyStock,
+        multiplySimd,
+        multiplyJs,
+        multiplyCache,
+        multiplySimdCache,
+      } from "./main.js";
+      function createRandomMatrix(size) {
+        const l = size * size;
+        const m = Array(l);
+        for (let i = 0; i < l; i++) {
+          m[i] = 20 - 10 * Math.random();
+        }
+        return m;
+      }
+
+      // Setup the inputs and event listeners
+      const input1 = document.getElementById("input-1");
+
+      const update = () => {
+        const size = Math.floor(Number(input1.value));
+        const matrix1 = createRandomMatrix(size);
+        const matrix2 = createRandomMatrix(size);
+        console.time("simd");
+        const result_simd = multiplySimd(matrix1, matrix2, size);
+        console.timeEnd("simd");
+
+        console.time("stock");
+        const result = multiplyStock(matrix1, matrix2, size);
+        console.timeEnd("stock");
+
+        console.time("javascript");
+        const result_js = multiplyJs(matrix1, matrix2, size);
+        console.timeEnd("javascript");
+
+        console.time("cache");
+        const result_cache = multiplyCache(matrix1, matrix2, size);
+        console.timeEnd("cache");
+
+        console.time("simd-cache");
+        const result_simd_cache = multiplySimdCache(matrix1, matrix2, size);
+        console.timeEnd("simd-cache");
+      };
+      document.getElementById("go-button").addEventListener("click", update);
+
+      // first time load
+      update();
+    </script>
+  </head>
+
+  <body>
+    <div class="title">
+      Multiply matrices with SIMD instructions, benchmark!
+    </div>
+    <div>
+      <span>Size of the matrices:</span><input id="input-1" type="number" /
+      value="100">
+    </div>
+    <div><input id="go-button" type="button" value="Go" /></div>
+    <div><span>Result:</span><span id="result"></span></div>
+  </body>
+</html>
